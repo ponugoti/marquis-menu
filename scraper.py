@@ -2,7 +2,9 @@ from bs4 import BeautifulSoup as soup
 from datetime import date, timedelta
 from collections import defaultdict
 from sys import argv
-import os
+from os import path
+from copy import deepcopy
+from unicodedata import normalize
 import pickle
 import requests
 
@@ -104,10 +106,13 @@ def fetch_term_meals():
 
             # Menu response in raw html format
             raw_menu = content.find_all('div', id=weekday_tag)[0].find('table').find('tbody').find_all('td')
-            menu_list = [item.text.strip() for item in raw_menu if item.contents and item.text.strip() is not None]
+            raw_menu_list = [item.text.strip() for item in raw_menu if item.contents and item.text.strip() is not None]
+
+            # Remove weird HTML artifact unicode symbols
+            menu_list = [normalize("NFKD", item) for item in raw_menu_list]
 
             # Add soups to brunch instead of lunch on weekends
-            todays_meal_types = ('brunch', 'supper') if today.isoweekday in (6, 7) else ('lunch', 'supper')
+            todays_meal_types = ('brunch', 'supper') if today.isoweekday() in (6, 7) else ('lunch', 'supper')
 
             # Extract soups for the day and add them to both lunch/brunch and supper
             for meal in todays_meal_types:
@@ -130,24 +135,46 @@ def fetch_term_meals():
                 # Reached the end of the menu for the day
                 if cursor == len(menu_list):
                     break
+
+                # A lot of things are broken on valentine's day (including hearts)
+                if today == date(2018, 2, 14):
+                    # There are no entries for this category on this day, deal with it...
+                    if menu_list[cursor].lower() == "hot plates":
+                        current_category = menu_list[cursor].lower()
+                        foods.add(day=today, meal=current_meal, category=current_category, item=None)
+                        cursor += 1
+
+                    elif menu_list[cursor].lower() == "dessert":
+                        current_category = menu_list[cursor].lower()
+                        cursor += 1
+
+
+                if today == date(2018, 2, 14) and menu_list[cursor].lower() == "hot plates":
+                    current_category = menu_list[cursor].lower()
+                    foods.add(day=today, meal=current_meal, category=current_category, item=None)
+                    cursor += 1
                 # If the current positon is that of a category header, update current category
                 if menu_list[cursor].lower() in foods.categories:
-                    current_category = menu_list[cursor]
+                    current_category = menu_list[cursor].lower()
                     cursor += 1
                 # If the current cursor is that of a meal header, update current meal
                 if menu_list[cursor].lower() in foods.meals:
-                    current_meal = menu_list[cursor]
+                    current_meal = menu_list[cursor].lower()
                     cursor += 1
-                    current_category = menu_list[cursor]
+                    # The supper header in changed on valentine's day which messes up the whole day *facepalm*
+                    if today == date(2018, 2, 14) and menu_list[cursor].lower() == "valentine's day special menu":
+                        cursor += 1
+                    current_category = menu_list[cursor].lower()
                     cursor += 1
+
     return foods
 
 if __name__ == '__main__':
     fname = 'term_menu.pickle'
-    if os.path.isfile(fname):
+    if path.isfile(fname):
         print(fname, "already in current directiory.")
     else:
         foods = fetch_term_meals()
         with open(fname, 'wb') as pfile:
-            pickle.dump(foods, pfile)
+            pickle.dump(foods.db, pfile)
         print(fname, "created in current directiory.")

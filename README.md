@@ -4,7 +4,7 @@ I found the [culinary center's website](http://www.usask.ca/culinaryservices/mar
 
 To get started, run `python server.py` to get the current day's menu.
 
-To look up a specific date, run `python -d server.py <month> <day>`
+To look up a specific date, run `python server.py -d <month> <day>`
 
 If the cache file isn't present in the same directory during the first run of `server.py`, then the menu for the term is scraped from the official website. Once it's done, menus can looked up locally.
 

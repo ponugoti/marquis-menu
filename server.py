@@ -56,7 +56,7 @@ class Reporter():
                     for food in food_items:
                         print("\t", food)
         except AttributeError:
-            print("Oops! Marquis Hall has not made the menu available for this day")
+            print("Sorry! The menu for this day is not available")
 
 
 if __name__ == '__main__':

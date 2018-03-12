@@ -1,5 +1,5 @@
 # Marquis Menu
-To get started, run `python server.py [` to get the current day's menu.
+To get started, run `python server.py` to get the current day's menu.
 
 To look up a specific date, run `python -d server.py <month> <day>`
 

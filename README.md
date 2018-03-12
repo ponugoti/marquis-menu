@@ -1,4 +1,7 @@
 # Marquis Menu
+
+I found the [culinary center's website](http://www.usask.ca/culinaryservices/marquis-menu.php) clumsy to navigate so I built a small application to look up the menu from the terminal.
+
 To get started, run `python server.py` to get the current day's menu.
 
 To look up a specific date, run `python -d server.py <month> <day>`

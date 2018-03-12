@@ -106,19 +106,25 @@ def fetch_term_meals():
 
             # Menu response in raw html format
             raw_menu = content.find_all('div', id=weekday_tag)[0].find('table').find('tbody').find_all('td')
-            raw_menu_list = [item.text.strip() for item in raw_menu if item.contents and item.text.strip() is not None]
+            raw_menu_list = [item.text.strip() for item in raw_menu if item.contents and item.text.strip()]
 
             # Remove weird HTML artifact unicode symbols
             menu_list = [normalize("NFKD", item) for item in raw_menu_list]
 
             # Add soups to brunch instead of lunch on weekends
-            todays_meal_types = ('brunch', 'supper') if today.isoweekday() in (6, 7) else ('lunch', 'supper')
+            if today.isoweekday() in (6, 7):
+                todays_meal_types = ('brunch', 'supper')
+            else:
+                todays_meal_types = ('lunch', 'supper')
 
             # Extract soups for the day and add them to both lunch/brunch and supper
             for meal in todays_meal_types:
                 soup_cursor = 1
                 while menu_list[soup_cursor].lower() not in todays_meal_types:
-                    foods.add(day=today, meal=meal, category='soup', item=menu_list[soup_cursor])
+                    foods.add(day=today,
+                              meal=meal,
+                              category='soup',
+                              item=menu_list[soup_cursor])
                     soup_cursor += 1
 
             # keep track of position, current meal, and category in the menu while iterating
@@ -130,7 +136,10 @@ def fetch_term_meals():
 
             while True:
                 # Add the current menu item to the specific day, meal, and category
-                foods.add(day=today, meal=current_meal, category=current_category, item=menu_list[cursor])
+                foods.add(day=today,
+                          meal=current_meal,
+                          category=current_category,
+                          item=menu_list[cursor])
                 cursor += 1
                 # Reached the end of the menu for the day
                 if cursor == len(menu_list):
@@ -141,7 +150,10 @@ def fetch_term_meals():
                     # There are no entries for this category on this day, deal with it...
                     if menu_list[cursor].lower() == "hot plates":
                         current_category = menu_list[cursor].lower()
-                        foods.add(day=today, meal=current_meal, category=current_category, item=None)
+                        foods.add(day=today,
+                                  meal=current_meal,
+                                  category=current_category,
+                                  item=None)
                         cursor += 1
 
                     elif menu_list[cursor].lower() == "dessert":
@@ -161,20 +173,22 @@ def fetch_term_meals():
                 if menu_list[cursor].lower() in foods.meals:
                     current_meal = menu_list[cursor].lower()
                     cursor += 1
-                    # The supper header in changed on valentine's day which messes up the whole day *facepalm*
-                    if today == date(2018, 2, 14) and menu_list[cursor].lower() == "valentine's day special menu":
+                    # The supper header in changed on valentine's day. Sigh.
+                    if today == date(2018, 2, 14) and \
+                                menu_list[cursor].lower() == "valentine's day special menu":
                         cursor += 1
                     current_category = menu_list[cursor].lower()
                     cursor += 1
 
     return foods
 
-if __name__ == '__main__':
+def create_menu_pickle():
     fname = 'term_menu.pickle'
-    if path.isfile(fname):
-        print(fname, "already in current directiory.")
-    else:
+    if not path.isfile(fname):
         foods = fetch_term_meals()
         with open(fname, 'wb') as pfile:
             pickle.dump(foods.db, pfile)
         print(fname, "created in current directiory.")
+
+if __name__ == '__main__':
+        create_menu_pickle()

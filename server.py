@@ -1,7 +1,7 @@
 from sys import argv, exit
 import pickle
 import os
-from datetime import date
+from datetime import date, timedelta
 from scraper import create_menu_pickle
 
 # meal plan start and end date
@@ -17,19 +17,27 @@ class Reporter():
         self.weekend_meals = ('brunch', 'supper')
         self.weekday_meals = ('lunch', 'supper')
 
-    def report_food_occurance(self, food_item, from_day=None, till_day=None):
+    def report_food_occurance(self, target, from_day=None, till_day=None):
         """Report when a given food item occurs on the menu during the term."""
         current_date = term_start_date if from_day is None else from_day
         last_date = term_end_date if till_day is None else till_day
+
+        times_seen = 0  # how many times the food item is seen
 
         while current_date != term_end_date:
             daily_menu = self.menu[current_date]
             for meal in daily_menu:
                 for category in daily_menu[meal]:
                     for food_item in daily_menu[meal][category]:
-                        print("{} is served on {} for {}").format(fooditem, current_date, meal)
-
+                        if food_item and target.lower() in food_item.lower():
+                            print("{} is served on {} for {}".format(food_item, current_date, meal))
+                            times_seen += 1
             current_date += timedelta(days=1)
+
+        if times_seen is 0:
+            print("\nCouldn't find anything with", target.title(), "in the menu.")
+        else:
+            print("\nSearch complete.", times_seen, "items found.")
 
     def report_menu(self, day, meal=None, category=None):
         """Report the menu for the specified day, meal, and/or category."""
@@ -78,10 +86,9 @@ if __name__ == '__main__':
 
     if len(argv) > 1:
         flag = argv[1]
-        if flag is "-o":
-            # Occurance
-            # TODO
-            pass
+        if flag == "-o":
+            # Occurance of a particular food item
+            rep.report_food_occurance(target=argv[2])
 
         elif flag == "-d" or flag == "--date":
             # Menu for certain date

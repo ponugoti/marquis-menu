@@ -40,7 +40,7 @@ class Reporter():
     def mega_super_print(self, day, meal=None, category=None):
         """Display the container in a pretty way on the command line."""
         # Brunch on weekends is replaced by lunch on weekends
-        todays_meals = self.menu[day] if meal is None else self.menu[day][meal]
+        todays_meals = self.menu[day][meal] if meal else self.menu[day]
 
         try:
             print("+------------------------------+")
@@ -56,7 +56,7 @@ class Reporter():
                     for food in food_items:
                         print("\t", food)
         except AttributeError:
-            print("Sorry! The menu for this day is not available")
+            print("Sorry! The menu for this day is not available.")
 
 
 if __name__ == '__main__':

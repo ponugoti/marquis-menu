@@ -6,7 +6,7 @@ I found the [culinary center's website](http://www.usask.ca/culinaryservices/mar
 
 The daily menu of the culinary center can be looked up in two way:
 * For today's menu, `python3 menu.py`.
-* For menu of another day, `python3 menu.py -d <month> <day>`.
+* For menu of another day, `python3 menu.py [-d | --date] <month> <day>`.
 
 The menu for the appropriate day is displayed.
 
@@ -17,8 +17,8 @@ The menu for the appropriate day is displayed.
 ## Food Search
 
 To search for a food item using a search term, use one of the two supported ways:
-* For results from the whole term, `python3 menu.py -s <keyword>`
-* For results in a specific range, `python3 menu.py -s <keyword> <[from] mm dd> <[to] mm dd>`
+* For results from the whole term, `python3 menu.py [-s | --search] <keyword>`
+* For results in a specific range, `python3 menu.py [-s | --search] <keyword> <[from] mm dd> <[to] mm dd>`
 
 The search results from the appropriate date range are displayed.
 

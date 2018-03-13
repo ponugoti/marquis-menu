@@ -1,9 +1,7 @@
 from bs4 import BeautifulSoup as soup
 from datetime import date, timedelta
 from collections import defaultdict
-from sys import argv
 from os import path
-from copy import deepcopy
 from unicodedata import normalize
 import pickle
 import requests
@@ -192,6 +190,3 @@ def create_menu_pickle():
         with open(fname, 'wb') as pfile:
             pickle.dump(foods.db, pfile)
         print(fname, "created in current directiory.")
-
-if __name__ == '__main__':
-        create_menu_pickle()

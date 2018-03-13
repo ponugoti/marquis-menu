@@ -24,9 +24,12 @@ class food_database():
         self.meals = ('brunch', 'lunch', 'supper')
 
     def add(self, day, meal=None, category=None, item=None):
-        if day not in self.db: self.db[day] = {}
-        if meal not in self.db[day]: self.db[day][meal] = {}
-        if category not in self.db[day][meal]: self.db[day][meal][category] = []
+        if day not in self.db:
+            self.db[day] = {}
+        if meal not in self.db[day]:
+            self.db[day][meal] = {}
+        if category not in self.db[day][meal]:
+            self.db[day][meal][category] = []
 
         self.db[day][meal][category].append(item)
 

@@ -17,33 +17,55 @@ class Reporter():
         self.weekend_meals = ('brunch', 'supper')
         self.weekday_meals = ('lunch', 'supper')
 
-    def report_food_occurance(self, target, from_day=None, till_day=None):
+    def _print_search_results(self, matches, longest):
+        print("+--------+--------+" + '-' * (longest + 2) + "+")
+        print("| DATE   | MEAL   | FOOD ITEM" + ' ' * (longest - 9), '|')
+        print("+--------+--------+" + '-' * (longest + 2) + "+")
+        for day in matches:
+            print('|', day.strftime("%b %d"), end=' ')
+            for meal in matches[day]:
+                if meal is not list(matches[day].keys())[0]:
+                    print("\n|       ", end=' ')
+                print('|', meal, end=' ' * (6 - len(meal)))
+                for item in matches[day][meal]:
+                    if item is not matches[day][meal][0]:
+                        print("\n|        |" + ' ' * 7, end='')
+                    print(' |', item, end=' ' * (longest - len(item)))
+                    print(' |', end='')
+            print()
+            if day is not list(matches.keys())[-1]:
+                print("+--------+--------+" + '-' * (longest + 2) + "+")
+        print("+--------+--------+" + '-' * (longest + 2) + "+\n")
+
+    def search(self, target, from_day=None, till_day=None):
         """Report when a given food item occurs on the menu during the term."""
         current_date = term_start_date if from_day is None else from_day
         last_date = term_end_date if till_day is None else till_day
 
-        times_seen = 0  # how many times the food item is seen
+        matches = dict()    # all matches for target
+        times_seen = 0      # number of times the target was matched
+        longest_item = 0    # longest length of all food items found
 
-        while current_date != term_end_date:
+        while current_date != last_date:
             daily_menu = self.menu[current_date]
             for meal in daily_menu:
                 for category in daily_menu[meal]:
                     for food_item in daily_menu[meal][category]:
                         if food_item and target.lower() in food_item.lower():
-                            print("{} is served on {} for {}".format(food_item, current_date, meal))
+                            longest_item = max(len(food_item), longest_item)
+                            if current_date not in matches:
+                                matches[current_date] = {}
+                            if meal not in matches[current_date]:
+                                matches[current_date][meal] = []
+                            matches[current_date][meal].append(food_item)
                             times_seen += 1
             current_date += timedelta(days=1)
 
-        if times_seen is 0:
-            print("\nCouldn't find anything with", target.title(), "in the menu.")
+        if times_seen > 0:
+            self._print_search_results(matches, longest_item)
+            print("Search complete.", times_seen, "items found.")
         else:
-            print("\nSearch complete.", times_seen, "items found.")
-
-    def report_menu(self, day, meal=None, category=None):
-        """Report the menu for the specified day, meal, and/or category."""
-        # TODO
-
-        self.mega_super_print(day, meal, category)
+            print("\nCouldn't find anything with", target, "on the menu.")
 
     def mega_super_print(self, day, meal=None, category=None):
         """Display the container in a pretty way on the command line."""
@@ -86,11 +108,16 @@ if __name__ == '__main__':
 
     if len(argv) > 1:
         flag = argv[1]
-        if flag == "-o":
+        if flag in ('-s', '--search'):
             # Occurance of a particular food item
-            rep.report_food_occurance(target=argv[2])
+            if len(argv) is 7:
+                rep.search(target=argv[2], \
+                           from_day=date(2018, int(argv[3]), int(argv[4])), \
+                           till_day=date(2018, int(argv[5]), int(argv[6])))
+            else:
+                rep.search(target=argv[2])
 
-        elif flag == "-d" or flag == "--date":
+        elif flag in ('-d', '--date'):
             # Menu for certain date
             year, month, day = 2018, int(argv[2]), int(argv[3])
             rep.report_menu(day=date(year, month, day))

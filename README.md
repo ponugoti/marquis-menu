@@ -1,15 +1,27 @@
 # Marquis Menu
 
-I found the [culinary center's website](http://www.usask.ca/culinaryservices/marquis-menu.php) clumsy to navigate so I built a small application to look up the menu from the terminal.
+I found the [culinary center's website](http://www.usask.ca/culinaryservices/marquis-menu.php) clumsy to navigate so I built a small terminal application to look up the menu, and search for food.
 
-To get started, run `python server.py` to get the current day's menu.
+## Daily Menu
 
-To look up a specific date, run `python server.py -d <month> <day>`
+The daily menu of the culinary center can be looked up in two way:
+* For today's menu, run `python server.py`.
+* For menu of another day, run `python server.py -d <month> <day>`.
 
-If the cache file isn't present in the same directory during the first run of `server.py`, then the menu for the term is scraped from the official website. Once it's done, menus can looked up locally.
+The menu for the appropriate day is displayed.
 
-The menu for the appropriate date is displayed and will look something similar to these images.
-
-| Specific date                      |  Current date                    |
-| :---------------------------------:|:-------------------------------: |
+| Specific date | Current date |
+| :---:|:---: |
 | ![](/screenshots/menu_on_date.png) | ![](/screenshots/menu_today.png) |
+
+## Food Search
+
+To search for a food item using a search term, use one of the two supported ways:
+* For results from the whole term, run `python server.py -s <keyword>`
+* For results in a specific range, run `python server.py -s <keyword> <[from] mm dd> <[to] mm dd>`
+
+The search results from the appropriate date range are displayed.
+
+| Entire term                        |  Specified range                 |
+| :---:|:---: |
+| ![](/screenshots/search_general.png) | ![](/screenshots/search_in_range.png) |

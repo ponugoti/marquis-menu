@@ -3,7 +3,7 @@ from scraper import create_menu_pickle
 import pickle
 from sys import argv
 import os
-from datetime import date
+from datetime import date, timedelta
 
 fname = 'term_menu.pickle'
 if not os.path.isfile(fname):
@@ -24,10 +24,19 @@ if len(argv) is 1:
 if len(argv) > 1:
     flag = argv[1]
     if flag in ('-s', '--search'):
-        # Search for a food item
-        if len(argv) is 7:
-            rep.search(target=argv[2], \
-                       from_day=date(2018, int(argv[3]), int(argv[4])), \
+        # Search for food in the menu
+        if len(argv) is 4:
+            if argv[3] == 'today':
+                rep.search(target=argv[2],
+                           from_day=date.today(),
+                           till_day=date.today() + timedelta(days=1))
+            elif argv[3] == 'tomorrow':
+                rep.search(target=argv[2],
+                           from_day=date.today() + timedelta(days=1),
+                           till_day=date.today() + timedelta(days=2))
+        elif len(argv) is 7:
+            rep.search(target=argv[2],
+                       from_day=date(2018, int(argv[3]), int(argv[4])),
                        till_day=date(2018, int(argv[5]), int(argv[6])))
         else:
             rep.search(target=argv[2])

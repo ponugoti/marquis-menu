@@ -7,10 +7,8 @@ term_end_date = date(2018, 4, 28)
 class Reporter():
     """Print daily menu or other query responses that looks pretty."""
 
-    def __init__(self, food_dictionary):
-        self.menu = food_dictionary
-        self.weekend_meals = ('brunch', 'supper')
-        self.weekday_meals = ('lunch', 'supper')
+    def __init__(self, menu_dictionary):
+        self.menu = menu_dictionary
 
     def _print_search_results(self, matches, longest):
         print("+--------+--------+" + '-' * (longest + 2) + "+")
@@ -21,7 +19,7 @@ class Reporter():
             for meal in matches[day]:
                 if meal is not list(matches[day].keys())[0]:
                     print("\n|       ", end=' ')
-                print('|', meal, end=' ' * (6 - len(meal)))
+                print('|', meal.title(), end=' ' * (6 - len(meal)))
                 for item in matches[day][meal]:
                     if item is not matches[day][meal][0]:
                         print("\n|        |" + ' ' * 7, end='')
@@ -38,7 +36,7 @@ class Reporter():
         last_date = term_end_date if till_day is None else till_day
 
         matches = dict()    # all matches for target
-        times_seen = 0      # number of times the target was matched
+        num_matches = 0     # number of times the target was matched
         longest_item = 0    # longest length of all food items found
 
         while current_date != last_date:
@@ -53,12 +51,12 @@ class Reporter():
                             if meal not in matches[current_date]:
                                 matches[current_date][meal] = []
                             matches[current_date][meal].append(food_item)
-                            times_seen += 1
+                            num_matches += 1
             current_date += timedelta(days=1)
 
-        if times_seen > 0:
+        if num_matches > 0:
             self._print_search_results(matches, longest_item)
-            print("Search complete.", times_seen, "items found.")
+            print("Search complete.", num_matches, "items found.")
         else:
             print("\nCouldn't find anything with", target, "on the menu.")
 
